@@ -1,0 +1,33 @@
+{% extends 'my_master.html' %}
+{% block head_css %}
+{{ super() }}
+<style>
+    .btn{color: #333333;!important}
+</style>
+{% endblock %}
+{% block body %}
+<form method="POST" action="/admin/userprofileview/changeemail">
+    {{ changeEmailForm.csrf_token }}
+    邮箱:<br>{{ changeEmailForm.email() }}<br>
+    {% if changeEmailForm.email.errors %}
+	    <ul class=errors>
+	    {% for error in changeEmailForm.email.errors %}
+	      <li>{{ error }}</li>
+	    {% endfor %}
+	    </ul>
+  	{% endif %}
+    <input class="btn" type="submit" value="更改邮箱" id ="changeEmailSubmit">
+</form>
+<form method="POST" action="/admin/userprofileview/changepassword">
+    {{ changePasswordForm.csrf_token }}
+	密码:<br>{{ changePasswordForm.password() }}<br>
+        {% if changePasswordForm.password.errors %}
+	    <ul class=errors>
+	    {% for error in changePasswordForm.password.errors %}
+	      <li>{{ error }}</li>
+	    {% endfor %}
+	    </ul>
+  	{% endif %}
+    <input class="btn" type="submit" value="更改密码" id ="changePasswordSubmit">
+</form>
+{% endblock body %}

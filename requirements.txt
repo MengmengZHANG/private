@@ -1,0 +1,7 @@
+flask
+Flask-Admin==1.0.9
+Flask-Login
+requests
+flask_sqlalchemy
+flask_wtf
+Flask-BabelEx

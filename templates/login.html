@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>工作日志系统-qiuyu8290</title>
+<link type="text/css" rel="stylesheet" href="../../static/login/css/login.css" />
+</head>
+
+<body>
+<div class="main">
+    <div class="box">
+        <div class="logo"></div>
+        <div class="login">
+             <form action="" method="post">
+                {{ form.csrf_token }}
+                <label>邮箱: </label><br />
+                <input type="text" name="email" class="text" />
+                {% if form.email.errors %}
+                    <div class=errors>
+                    {% for error in form.email.errors %}
+                      {{ error }}
+                    {% endfor %}
+                    </div>
+                {% endif %}<br />
+                <label>密码：</label><br />
+                <input type="password" name="password" class="text" />
+                {% if form.password.errors %}
+                    <div class=errors>
+                    {% for error in form.password.errors %}
+                      {{ error }}
+                    {% endfor %}
+                    </div>
+                {% endif %}<br /><br />
+                <input type="submit" class="submit" value="登录" />
+            </form>
+        </div>
+        <div class="info">Developped by qiuyu8290<br>Copyright © 2012-2013 alleyloft.com All rights reserved </div>
+    </div>
+</div>
+</body>
+</html>
