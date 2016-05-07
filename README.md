@@ -1,1 +1,3 @@
-This repository stores all the private&backup sources. Can use different branch for different projects.
+This branch is used to backup the weekreport python project, that was once developped for the daily worklog system of police station of LIU Hang.
+
+
