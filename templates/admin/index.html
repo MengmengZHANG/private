@@ -84,6 +84,7 @@
             <div id="sidebar">
                 <div>当前日历:</div>
                 <div id ="focusedUser">...</div><br>
+                <div>请选择要显示的日历：</div>
                 <div id="tree"><div>
             </div>
             {% endif %}
@@ -153,7 +154,7 @@
                     center: 'title',
                     right: 'month,basicWeek,basicDay'
                 },
-                defaultView: 'basicWeek',
+                defaultView: 'month',
                 lang: currentLangCode,
                 weekNumbers: true,
                 editable: true,

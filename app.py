@@ -1,6 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import os,sys
+root = os.path.dirname(__file__)
+sys.path.insert(0, os.path.join(root, 'site-packages'))
+
 #flask
 from flask import Flask, flash, url_for, redirect, render_template, request,Response,session,g, make_response
 from flask.views import View
@@ -27,10 +31,10 @@ from wtforms.validators import Required, Email
 from flask.ext.babelex import Babel
 
 #tools
-import os, json, collections, traceback
+import json, collections, traceback
 import logging
 
-logging.basicConfig(level=logging.WARNING,
+logging.basicConfig(filename='functional.log',level=logging.WARNING,
                     format='[%(name)s] %(message)s')
 logger = logging.getLogger('Functional')
 # logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
@@ -49,31 +53,30 @@ def get_locale():
     return "zh"
 
 #local
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:admin@localhost/app_weekreport'
-# db = SQLAlchemy(app)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:admin@localhost/app_weekreport'
+db = SQLAlchemy(app)
 
 # sae
-from sae.const import (MYSQL_HOST, MYSQL_HOST_S,
-    MYSQL_PORT, MYSQL_USER, MYSQL_PASS, MYSQL_DB)
- 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://%s:%s@%s:%s/%s' % (MYSQL_USER,MYSQL_PASS,MYSQL_HOST,MYSQL_PORT,MYSQL_DB)
+# from sae.const import (MYSQL_HOST, MYSQL_HOST_S,
+#     MYSQL_PORT, MYSQL_USER, MYSQL_PASS, MYSQL_DB)
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://%s:%s@%s:%s/%s' % (MYSQL_USER,MYSQL_PASS,MYSQL_HOST,MYSQL_PORT,MYSQL_DB)
 
 #To reconnect db when time out of sae (30s)
-class nullpool_SQLAlchemy(SQLAlchemy): 
-    def apply_driver_hacks(self, app, info, options): 
-        super(nullpool_SQLAlchemy, self).apply_driver_hacks(app, info, options) 
-        from sqlalchemy.pool import NullPool 
-        options['poolclass'] = NullPool 
-        del options['pool_size'] 
-db = nullpool_SQLAlchemy(app)
-
-@app.before_request
-def before_request():
-   db = nullpool_SQLAlchemy(app)
-   
-@app.teardown_request
-def teardown_request(exception):
-    db.session.close()
+# class nullpool_SQLAlchemy(SQLAlchemy):
+#     def apply_driver_hacks(self, app, info, options):
+#         super(nullpool_SQLAlchemy, self).apply_driver_hacks(app, info, options)
+#         from sqlalchemy.pool import NullPool
+#         options['poolclass'] = NullPool
+#         del options['pool_size']
+# db = nullpool_SQLAlchemy(app)
+#
+# @app.before_request
+# def before_request():
+#    db = nullpool_SQLAlchemy(app)
+#
+# @app.teardown_request
+# def teardown_request(exception):
+#     db.session.close()
 
 # Guest user
 class Anonymous(AnonymousUserMixin):
@@ -153,6 +156,23 @@ class TreeNode(db.Model):
             d['children'] = subList
         return d
 
+# admin = User()
+# admin.name = 'admin'
+# admin.email = 'admin@test.com'
+# admin.isAdmin = True
+# admin.password = generate_password_hash('admin2017')
+#
+# guest = User()
+# guest.name = 'guest'
+# guest.email = 'guest@test.com'
+# guest.isAdmin = False
+# guest.password = generate_password_hash('guest2017')
+#
+# db.session.add(admin)
+# db.session.add(guest)
+# db.session.commit()
+# db.create_all()
+# db.session.commit()
 
 # Define login and registration forms (for flask-login)
 class LoginForm(form.Form):
@@ -440,5 +460,5 @@ admin.add_view(UserProfileView(name=u'个人信息'))
 admin.add_view(UserView(User, db.session, name=u'用户管理'))
 admin.add_view(TreeView(TreeNode, db.session, name=u'组织结构'))
 
-# app.debug = True
-# app.run(port=8080)
+app.debug = True
+app.run(port=8080)
