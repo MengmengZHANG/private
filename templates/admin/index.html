@@ -82,15 +82,15 @@
             </div>
             {% if current_user.has_children() %}
             <div id="sidebar">
-                <div>当前日历:</div>
+                <div>selected calendar:</div>
                 <div id ="focusedUser">...</div><br>
-                <div>请选择要显示的日历：</div>
+                <div>Please select which calendar to display：</div>
                 <div id="tree"><div>
             </div>
             {% endif %}
         </div>
         <div id="footer">
-            <div id="dialog-form" title="事件">
+            <div id="dialog-form" title="Event">
                 <form>
                     <textarea id="eventContent1" rows='4' cols='35'></textarea><br>
                 </form>
@@ -112,7 +112,7 @@
             {% endif %}
             </div>
             {% endfor %}
-            <button class="btn" type="submit">登录</button>
+            <button class="btn" type="submit">Login</button>
         </form>
         {{ link | safe }}
         {% endif %}
@@ -226,7 +226,7 @@
           date:null,
           buttons: [
           {
-            text:"保存",
+            text:"Save",
             click:function(){
                 content = textarea_event.val();
                 if(content){
@@ -243,7 +243,7 @@
             }
           },
           {
-            text:"删除",
+            text:"Delete",
             click:function(){
                 eventId = dialogForm.dialog("option", "eventId");
                 if(eventId){

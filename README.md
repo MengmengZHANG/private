@@ -1,5 +1,22 @@
 This branch is used to backup the weekreport python project, that was once developped for the daily worklog system of police station of LIU Hang.
 
+============Install=================
+1.(optional) virtualenv ENV: initialize /ENV
+2. activate script
+	- linux
+		- source bin/activate
+		- deactivate
+	- windows
+		- /ENV/Scripts/activate.bat
+		- /ENV/Scripts/deactivate.bat
+3. (optional) Removing an Environment
+	- linux
+		rm -r /path/to/ENV
+4. pip install -r requirements.txt
+5. python app.py
+====================================
+
+
 
 pip install --target=site-packages -r requirements.txt
 

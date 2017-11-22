@@ -1,7 +1,6 @@
 flask
-Flask-Admin==1.0.9
+Flask-Admin
 Flask-Login
-requests
 flask_sqlalchemy
 flask_wtf
 Flask-BabelEx

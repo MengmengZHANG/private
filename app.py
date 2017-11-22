@@ -1,34 +1,25 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import os,sys
-root = os.path.dirname(__file__)
-sys.path.insert(0, os.path.join(root, 'site-packages'))
-
-#flask
-from flask import Flask, flash, url_for, redirect, render_template, request,Response,session,g, make_response
-from flask.views import View
+from flask import Flask, flash, url_for, redirect, render_template, request,Response, make_response
 import flask_admin as admin
 from flask_admin import helpers, expose
 import flask_login as login
-from flask.ext.login import login_required, AnonymousUserMixin
-from flask.ext.admin import BaseView
+from flask_login.utils import login_required
+from flask_login.mixins import AnonymousUserMixin
+from flask_admin import BaseView
 
 #password
 from werkzeug.security import generate_password_hash, check_password_hash
 
 #db
 from flask_sqlalchemy import SQLAlchemy
-from flask.ext.admin.contrib import sqla
+from flask_admin.contrib import sqla
 from sqlalchemy.orm import joinedload_all
-from sqlalchemy.orm.collections import attribute_mapped_collection
 
 #form
 from wtforms import form, fields, StringField, PasswordField, SubmitField, validators
 from wtforms.validators import Required, Email
-
-#localization
-from flask.ext.babelex import Babel
 
 #tools
 import json, collections, traceback
@@ -45,38 +36,9 @@ app = Flask(__name__)
 # Create dummy secrey key so we can use sessions
 app.secret_key = 'litonqiuyu8290'
 
-# Initialize babel
-babel = Babel(app)
-
-@babel.localeselector
-def get_locale():
-    return "zh"
-
 #local
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:admin@localhost/app_weekreport'
 db = SQLAlchemy(app)
-
-# sae
-# from sae.const import (MYSQL_HOST, MYSQL_HOST_S,
-#     MYSQL_PORT, MYSQL_USER, MYSQL_PASS, MYSQL_DB)
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://%s:%s@%s:%s/%s' % (MYSQL_USER,MYSQL_PASS,MYSQL_HOST,MYSQL_PORT,MYSQL_DB)
-
-#To reconnect db when time out of sae (30s)
-# class nullpool_SQLAlchemy(SQLAlchemy):
-#     def apply_driver_hacks(self, app, info, options):
-#         super(nullpool_SQLAlchemy, self).apply_driver_hacks(app, info, options)
-#         from sqlalchemy.pool import NullPool
-#         options['poolclass'] = NullPool
-#         del options['pool_size']
-# db = nullpool_SQLAlchemy(app)
-#
-# @app.before_request
-# def before_request():
-#    db = nullpool_SQLAlchemy(app)
-#
-# @app.teardown_request
-# def teardown_request(exception):
-#     db.session.close()
 
 # Guest user
 class Anonymous(AnonymousUserMixin):
@@ -176,8 +138,8 @@ class TreeNode(db.Model):
 
 # Define login and registration forms (for flask-login)
 class LoginForm(form.Form):
-    email = StringField(u'邮箱', [Required(message=u'*必填项'), Email(message=u'无效的邮箱地址')])#todo css
-    password = PasswordField(u'密码', [Required(message=u'*必填项')])
+    email = StringField('Email', [Required(message='*Required'), Email(message='Invalid email')])#todo css
+    password = PasswordField('Password', [Required(message='*Required')])
 
     def validate(self):
         rv = form.Form.validate(self)
@@ -187,20 +149,20 @@ class LoginForm(form.Form):
         user = db.session.query(User).filter_by(email=self.email.data).first()
 
         if user is None:
-            self.email.errors.append(u'无此用户')
+            self.email.errors.append('Email or password is wrong')
             return False
 
         # we're comparing the plaintext pw with the the hash from the db
         if not check_password_hash(user.password, self.password.data):
         # to compare plain text passwords use
         # if user.password != self.password.data:
-            self.password.errors.append(u'密码错误')
+            self.password.errors.append('Email or password is wrong')
             return False
         self.user = user
         return True
 
 class ChangeEmailForm(form.Form):
-    email = StringField('email', [Required(message=u'请输入您的新邮箱地址'), Email(message=u'无效的邮箱地址')])#todo css
+    email = StringField('email', [Required(message='Please input your new email'), Email(message='Invalid email')])#todo css
     def validate(self):
         rv = form.Form.validate(self)
         if not rv:
@@ -208,7 +170,7 @@ class ChangeEmailForm(form.Form):
         return True
 
 class ChangePasswordForm(form.Form):
-    password = PasswordField(u'密码', [Required(message=u'请输入您的新密码')])
+    password = PasswordField('Password', [Required(message='Please input your new password')])
     def validate(self):
         rv = form.Form.validate(self)
         if not rv:
@@ -252,7 +214,7 @@ class UserProfileView(BaseView):
                 login.current_user.email = changeEmailForm.email.data
                 db.session.commit()
                 logger.warning("UserID = %d, email changed to %s" % (login.current_user.id, login.current_user.email))
-                flash(u'邮箱已修改！')
+                flash('Email is modified successfully！')
 
             changePasswordForm = ChangePasswordForm()
             response = self.render('user_profile_page.html',changeEmailForm=changeEmailForm, changePasswordForm=changePasswordForm)
@@ -268,7 +230,7 @@ class UserProfileView(BaseView):
                 login.current_user.password = generate_password_hash(changePasswordForm.password.data)
                 db.session.commit()
                 logger.warning("UserID = %s, password changed" % login.current_user.id)
-                flash(u'密码已修改！')
+                flash('Password is changed successfully！')
             changeEmailForm = ChangeEmailForm()
             changeEmailForm.email.data = login.current_user.email
             response = response = self.render('user_profile_page.html',changeEmailForm=changeEmailForm, changePasswordForm=changePasswordForm)
@@ -279,7 +241,7 @@ class UserProfileView(BaseView):
 class UserView(sqla.ModelView):
     column_exclude_list = ["password"]
     column_searchable_list = (User.name, User.email)
-    column_labels = dict(name=u"姓名",email=u"邮箱",isAdmin=u"管理员",password=u"密码")
+    column_labels = dict(name="Name",email="Email",isAdmin="isAdmain?",password="Password")
     def is_accessible(self):
         return login.current_user.is_admin()
     def on_model_change(self, form, model, is_created=False):
@@ -292,7 +254,7 @@ class UserView(sqla.ModelView):
 class TreeView(sqla.ModelView):
     column_exclude_list = ['children']
     column_searchable_list = [TreeNode.name]
-    column_labels = dict(name=u"本节点名称",parent=u"上级名称", children=u"下级名称")
+    column_labels = dict(name="User name",parent="Manager name", children="Team member name(s)")
     def is_accessible(self):
         return login.current_user.is_admin()
     def on_model_change(self, form, model, is_created):
@@ -453,12 +415,12 @@ def updateEvent():
 init_login()
 
 # Create admin, with view MyAdminIndexView
-admin = admin.Admin(app, u'工作日志系统', index_view=MyAdminIndexView(name=u'首页'), base_template='my_master.html')
+admin = admin.Admin(app, 'Week report system', index_view=MyAdminIndexView(name='Home'), base_template='my_master.html')
 
 # Add view
-admin.add_view(UserProfileView(name=u'个人信息'))
-admin.add_view(UserView(User, db.session, name=u'用户管理'))
-admin.add_view(TreeView(TreeNode, db.session, name=u'组织结构'))
+admin.add_view(UserProfileView(name='Profile'))
+admin.add_view(UserView(User, db.session, name='User Management'))
+admin.add_view(TreeView(TreeNode, db.session, name='Organization'))
 
 app.debug = True
 app.run(port=8080)
