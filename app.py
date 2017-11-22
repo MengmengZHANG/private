@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import config
 
 from flask import Flask, flash, url_for, redirect, render_template, request,Response, make_response
 import flask_admin as admin
@@ -37,7 +38,7 @@ app = Flask(__name__)
 app.secret_key = 'litonqiuyu8290'
 
 #local
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:admin@localhost/app_weekreport'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://'+config.mysqlUser+':'+config.mysqlPassword+'@localhost/app_weekreport'
 db = SQLAlchemy(app)
 
 # Guest user
@@ -423,4 +424,4 @@ admin.add_view(UserView(User, db.session, name='User Management'))
 admin.add_view(TreeView(TreeNode, db.session, name='Organization'))
 
 app.debug = True
-app.run(port=8080)
+app.run(host='0.0.0.0', port=80)
