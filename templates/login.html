@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+i<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -14,7 +14,7 @@
              <form action="" method="post">
                 {{ form.csrf_token }}
                 <label>Email: </label><br />
-                <input type="text" name="email" class="text" />
+                <input type="text" name="email" class="text" value="admin@test.com"/>
                 {% if form.email.errors %}
                     <div class=errors>
                     {% for error in form.email.errors %}
@@ -23,7 +23,7 @@
                     </div>
                 {% endif %}<br />
                 <label>Password: </label><br />
-                <input type="password" name="password" class="text" />
+                <input type="password" name="password" class="text" value="admin2017"/>
                 {% if form.password.errors %}
                     <div class=errors>
                     {% for error in form.password.errors %}
@@ -33,6 +33,7 @@
                 {% endif %}<br /><br />
                 <input type="submit" class="submit" value="Login" />
             </form>
+	<div class="errors">* You can use the prefilled user/password to login as a demo admin user</div>
         </div>
         <div class="info">Developped by Mengmeng ZHANG<br>Copyright © 2012-2013 alleyloft.com All rights reserved </div>
     </div>
