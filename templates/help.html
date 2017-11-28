@@ -1,0 +1,28 @@
+{% extends 'my_master.html' %}
+{% block head_css %}
+{{ super() }}
+<style>
+    .btn{color: #333333;!important}
+</style>
+{% endblock %}
+{% block body %}
+<h4>What is Week Report System?</h4>
+
+<p>This system is designed for:</p>
+<ul>
+    <li>employees to report what they have done every work day</li>
+    <li>employers / managers to review what their team members have done every work day</li>
+</ul>
+
+<h4>How an employee can report their daily work?</h4>
+<p>At Home page, one calendar will be displayed. The user can click on the date it wants to report, and in the popup window report his work event</p>
+<p>This event can be also be seen by the employee's manager, which is defined at Organization page</p>
+
+<h4>How to define the hierarchy of manager/employee?</h4>
+<p>For example, if you want to define that user1 is the manager of user2, and user2 is the manager of user3 and user4, you can:</p>
+<ul>
+    <li>Go to Organization page</li>
+    <li>Create one new relationship by click on Create button</li>
+    <li>Put User name=user2, Manager name=user1, Team member = user3, user4 </li>
+</ul>
+{% endblock %}

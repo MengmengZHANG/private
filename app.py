@@ -52,18 +52,15 @@ class Anonymous(AnonymousUserMixin):
 class User(db.Model):
     extend_existing=True
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100))
+    email = db.Column(db.String(120), nullable = False, unique = True)
+    name = db.Column(db.String(100), nullable = False)
     isAdmin = db.Column(db.Boolean, default=False)
-    email = db.Column(db.String(120), nullable = False)
     password = db.Column(db.String(160), nullable = False)
-    def is_authenticated(self):
-        return True
+    is_authenticated = True
+    is_active = True
+    is_anonymous = False
     def is_admin(self):
         return self.isAdmin
-    def is_active(self):
-        return True
-    def is_anonymous(self):
-        return False
     def get_id(self):
         return self.id
     def has_children(self):
@@ -103,9 +100,9 @@ class TreeNode(db.Model):
                     )
 
     def __repr__(self):
-        #This value also shows in UI tree node 
+        #This value also shows in UI tree node
         return self.name;
-        
+
 
     def dump(self):
         d = collections.OrderedDict()
@@ -119,28 +116,29 @@ class TreeNode(db.Model):
             d['children'] = subList
         return d
 
-# admin = User()
-# admin.name = 'admin'
-# admin.email = 'admin@test.com'
-# admin.isAdmin = True
-# admin.password = generate_password_hash('admin2017')
+
+# manager = User()
+# manager.name = 'manager'
+# manager.email = 'manager@test.com'
+# manager.isAdmin = True
+# manager.password = generate_password_hash('password2017')
 #
-# guest = User()
-# guest.name = 'guest'
-# guest.email = 'guest@test.com'
-# guest.isAdmin = False
-# guest.password = generate_password_hash('guest2017')
+# employee = User()
+# employee.name = 'employee1'
+# employee.email = 'employee1@test.com'
+# employee.isAdmin = False
+# employee.password = generate_password_hash('password2017')
 #
-# db.session.add(admin)
-# db.session.add(guest)
-# db.session.commit()
 # db.create_all()
+# db.session.add(manager)
+# db.session.add(employee)
 # db.session.commit()
+
 
 # Define login and registration forms (for flask-login)
 class LoginForm(form.Form):
-    email = StringField('Email', [Required(message='*Required'), Email(message='Invalid email')])#todo css
-    password = PasswordField('Password', [Required(message='*Required')])
+    email = StringField(u'Email', [Required(message=u'*Required'), Email(message=u'Invalid email')])#todo css
+    password = PasswordField(u'Password', [Required(message=u'*Required')])
 
     def validate(self):
         rv = form.Form.validate(self)
@@ -150,20 +148,20 @@ class LoginForm(form.Form):
         user = db.session.query(User).filter_by(email=self.email.data).first()
 
         if user is None:
-            self.email.errors.append('Email or password is wrong')
+            self.email.errors.append(u'Email or password is wrong')
             return False
 
         # we're comparing the plaintext pw with the the hash from the db
         if not check_password_hash(user.password, self.password.data):
         # to compare plain text passwords use
         # if user.password != self.password.data:
-            self.password.errors.append('Email or password is wrong')
+            self.password.errors.append(u'Email or password is wrong')
             return False
         self.user = user
         return True
 
 class ChangeEmailForm(form.Form):
-    email = StringField('email', [Required(message='Please input your new email'), Email(message='Invalid email')])#todo css
+    email = StringField(u'email', [Required(message=u'Please input your new email'), Email(message=u'Invalid email')])#todo css
     def validate(self):
         rv = form.Form.validate(self)
         if not rv:
@@ -171,7 +169,7 @@ class ChangeEmailForm(form.Form):
         return True
 
 class ChangePasswordForm(form.Form):
-    password = PasswordField('Password', [Required(message='Please input your new password')])
+    password = PasswordField(u'Password', [Required(message=u'Please input your new password')])
     def validate(self):
         rv = form.Form.validate(self)
         if not rv:
@@ -194,7 +192,7 @@ class UserProfileView(BaseView):
     fakePassword = "******"
 
     def is_accessible(self):
-        return login.current_user.is_authenticated()
+        return login.current_user.is_authenticated
 
     @expose('/', methods=['GET'])
     def index(self):    
@@ -215,7 +213,7 @@ class UserProfileView(BaseView):
                 login.current_user.email = changeEmailForm.email.data
                 db.session.commit()
                 logger.warning("UserID = %d, email changed to %s" % (login.current_user.id, login.current_user.email))
-                flash('Email is modified successfully！')
+                flash(u'Email is modified successfully！')
 
             changePasswordForm = ChangePasswordForm()
             response = self.render('user_profile_page.html',changeEmailForm=changeEmailForm, changePasswordForm=changePasswordForm)
@@ -231,7 +229,7 @@ class UserProfileView(BaseView):
                 login.current_user.password = generate_password_hash(changePasswordForm.password.data)
                 db.session.commit()
                 logger.warning("UserID = %s, password changed" % login.current_user.id)
-                flash('Password is changed successfully！')
+                flash(u'Password is changed successfully！')
             changeEmailForm = ChangeEmailForm()
             changeEmailForm.email.data = login.current_user.email
             response = response = self.render('user_profile_page.html',changeEmailForm=changeEmailForm, changePasswordForm=changePasswordForm)
@@ -240,33 +238,43 @@ class UserProfileView(BaseView):
         return response
 
 class UserView(sqla.ModelView):
+    can_edit = False
     column_exclude_list = ["password"]
+    #inline edit
+    column_editable_list = ["name","email","isAdmin"]
     column_searchable_list = (User.name, User.email)
-    column_labels = dict(name="Name",email="Email",isAdmin="isAdmain?",password="Password")
+    column_labels = dict(name="Name",email="Email",isAdmin="isAdmain?")
     def is_accessible(self):
         return login.current_user.is_admin()
     def on_model_change(self, form, model, is_created=False):
-        model.password = generate_password_hash(form.password.data)
+        # used for create user
+        if is_created:
+            model.password = generate_password_hash(form.password.data)
         logger.warning("UserID = %d, admin user view. Model[id=%s] changed to: created?[%s], name[%s], isAdmin[%s], email[%s]." %(login.current_user.id, model.id, is_created, model.name,model.isAdmin,model.email))
     
     def on_model_delete(self, model):
         logger.warning("UserID = %d, admin user view. Model[id=%d] deleted: name[%s], isAdmin[%s], email[%s]." %(login.current_user.id, model.id, model.name,model.isAdmin,model.email))
 
+class HelpView(BaseView):
+    @expose('/')
+    def index(self):
+        return self.render('help.html')
+
 class TreeView(sqla.ModelView):
     column_exclude_list = ['children']
     column_searchable_list = [TreeNode.name]
-    column_labels = dict(name="User name",parent="Manager name", children="Team member name(s)")
+    column_labels = dict(name="Team name",parent="Team Manager name", children="Team member name(s)")
     def is_accessible(self):
         return login.current_user.is_admin()
     def on_model_change(self, form, model, is_created):
         logger.warning("UserID = %d, admin tree view. Model[id=%s] changed to: created?[%s], name[%s], children%s, parent[%s]." %(login.current_user.id, model.id, is_created, model.name,model.children,model.parent))
-    
+
     def on_model_delete(self, model):
         logger.warning("UserID = %d, admin tree view. Model[id=%d] deleted: name[%s], children%s, parent[%s]." %(login.current_user.id, model.id,model.name,model.children,model.parent))
 
 class CalendarView(BaseView):
     def is_accessible(self):
-        return login.current_user.is_authenticated()
+        return login.current_user.is_authenticated
 
     @expose('/')
     def index(self):
@@ -277,13 +285,14 @@ class MyAdminIndexView(admin.AdminIndexView):
 
     @expose('/')
     def index(self):
-        if not login.current_user.is_authenticated():
+        if not login.current_user.is_authenticated:
             return redirect(url_for('index'))
         try:
             response = make_response(super(MyAdminIndexView, self).index())
+            logger.info(response)
         except Exception, err:
             logger.error(traceback.format_exc())
-        response.set_cookie('focusedUserName', login.current_user.name)
+        # response.set_cookie('focusedUserName', login.current_user.name)
         response.set_cookie('currentUserName', login.current_user.name)
         return response
 
@@ -306,7 +315,7 @@ def index():
         if validate:
             login.login_user(form.user)
 
-        if login.current_user.is_authenticated():
+        if login.current_user.is_authenticated:
             logger.warning("UserID = %d, login successfully, email = %s" %(login.current_user.id, form.email.data))
             return redirect(url_for('admin.index'))
         logger.warning("Login failed, email: " + form.email.data)
@@ -353,10 +362,10 @@ def getEvents():
 @login_required
 def getUserTree():
     userName = login.current_user.name
-    node = db.session.query(TreeNode).\
+    node = db.session.query(User).\
                     options(joinedload_all("children", "children",
                                             "children", "children")).\
-                    filter(TreeNode.name == userName).\
+                    filter(User.name == userName).\
                     first()
     responseList = []
     responseList.append(node.dump())
@@ -422,6 +431,7 @@ admin = admin.Admin(app, 'Week report system', index_view=MyAdminIndexView(name=
 admin.add_view(UserProfileView(name='Profile'))
 admin.add_view(UserView(User, db.session, name='User Management'))
 admin.add_view(TreeView(TreeNode, db.session, name='Organization'))
+admin.add_view(HelpView(name='Help'))
 
 app.debug = True
 app.run(host='0.0.0.0', port=80)

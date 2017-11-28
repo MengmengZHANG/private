@@ -1,4 +1,4 @@
-i<!DOCTYPE html>
+<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -14,7 +14,7 @@ i<!DOCTYPE html>
              <form action="" method="post">
                 {{ form.csrf_token }}
                 <label>Email: </label><br />
-                <input type="text" name="email" class="text" value="admin@test.com"/>
+                <input type="text" name="email" class="text" value="manager@test.com"/>
                 {% if form.email.errors %}
                     <div class=errors>
                     {% for error in form.email.errors %}
@@ -23,7 +23,7 @@ i<!DOCTYPE html>
                     </div>
                 {% endif %}<br />
                 <label>Password: </label><br />
-                <input type="password" name="password" class="text" value="admin2017"/>
+                <input type="password" name="password" class="text" value="password2017"/>
                 {% if form.password.errors %}
                     <div class=errors>
                     {% for error in form.password.errors %}
