@@ -265,24 +265,24 @@
 
 </script>
 <script>
-$(function() {
-    $('#tree').tree({
-        dataUrl: '../../getusertree'
-    });
-});
-$('#tree').bind(
-    'tree.dblclick',
-    function(event) {
-        var cookieName = 'focusedUserName';
-        var cookieValue = event.node.name;
-        var myDate = new Date();
-        myDate.setMonth(myDate.getMonth() + 12);
-        document.cookie = cookieName +"=" + cookieValue + ";path=/";
-        $('#calendar').fullCalendar( 'refetchEvents' );
-        $('#focusedUser').text(getCookie("focusedUserName"));
-    }
-);
-$('#tree');
+<!--$(function() {-->
+    <!--$('#tree').tree({-->
+        <!--dataUrl: '../../getusertree'-->
+    <!--});-->
+<!--});-->
+<!--$('#tree').bind(-->
+    <!--'tree.dblclick',-->
+    <!--function(event) {-->
+        <!--var cookieName = 'focusedUserName';-->
+        <!--var cookieValue = event.node.name;-->
+        <!--var myDate = new Date();-->
+        <!--myDate.setMonth(myDate.getMonth() + 12);-->
+        <!--document.cookie = cookieName +"=" + cookieValue + ";path=/";-->
+        <!--$('#calendar').fullCalendar( 'refetchEvents' );-->
+        <!--$('#focusedUser').text(getCookie("focusedUserName"));-->
+    <!--}-->
+<!--);-->
+<!--$('#tree');-->
 </script>
 
 {% endblock %}
