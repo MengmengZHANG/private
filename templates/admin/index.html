@@ -63,8 +63,12 @@
         margin-top: 0;
         padding: 0em 1em 0em .4em;
     }
-
-
+    #tree {
+        background-color: #77889936;
+    }
+    #focusedUser {
+        background-color: #77889936;
+    }
 </style>
 {% endblock %}
 {% block head_tail %}
@@ -82,9 +86,9 @@
             </div>
             {% if current_user.has_children() %}
             <div id="sidebar">
-                <div>selected calendar:</div>
+                <div>Displaying calendar of user:</div>
                 <div id ="focusedUser">...</div><br>
-                <div>Show the calendar of your team member (Double click on its name)</div>
+                <div>Show others' calendar by Double clicking on its name</div>
                 <div id="tree"><div>
             </div>
             {% endif %}
@@ -188,7 +192,7 @@
             });
         };
         renderCalendar();
-        //$('#focusedUser').text(getCookie("focusedUserName"));
+        $('#focusedUser').text(getCookie("focusedUserName"));
 
         function createEvent(date,content){
             $.post("../../createevent",

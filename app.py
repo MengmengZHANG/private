@@ -39,6 +39,7 @@ app.secret_key = 'litonqiuyu8290'
 
 #local
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://'+config.mysqlUser+':'+config.mysqlPassword+'@localhost/app_weekreport'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 # Guest user
@@ -263,7 +264,7 @@ class HelpView(BaseView):
 class TreeView(sqla.ModelView):
     column_exclude_list = ['children']
     column_searchable_list = [TreeNode.name]
-    column_labels = dict(name="Team name",parent="Team Manager name", children="Team member name(s)")
+    column_labels = dict(name="User name",parent="Manager name", children="Team member name(s)")
     def is_accessible(self):
         return login.current_user.is_admin()
     def on_model_change(self, form, model, is_created):
@@ -292,7 +293,7 @@ class MyAdminIndexView(admin.AdminIndexView):
             logger.info(response)
         except Exception, err:
             logger.error(traceback.format_exc())
-        # response.set_cookie('focusedUserName', login.current_user.name)
+        response.set_cookie('focusedUserName', login.current_user.name)
         response.set_cookie('currentUserName', login.current_user.name)
         return response
 
@@ -362,10 +363,10 @@ def getEvents():
 @login_required
 def getUserTree():
     userName = login.current_user.name
-    node = db.session.query(User).\
+    node = db.session.query(TreeNode).\
                     options(joinedload_all("children", "children",
                                             "children", "children")).\
-                    filter(User.name == userName).\
+                    filter(TreeNode.name == userName).\
                     first()
     responseList = []
     responseList.append(node.dump())

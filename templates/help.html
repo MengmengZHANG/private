@@ -12,17 +12,67 @@
 <ul>
     <li>employees to report what they have done every work day</li>
     <li>employers / managers to review what their team members have done every work day</li>
+    <li>manager can see but not modify the report of its team member</li>
 </ul>
 
 <h4>How an employee can report their daily work?</h4>
 <p>At Home page, one calendar will be displayed. The user can click on the date it wants to report, and in the popup window report his work event</p>
 <p>This event can be also be seen by the employee's manager, which is defined at Organization page</p>
 
+<h4>How an manager review its team member's report?</h4>
+<p>At Home page, at the right panel. It's showing the currently displayed calendar belongs to which user, by default it's the current logged in user.</p>
+<p>A manager can expand / collapse the user tree to see its team members, and double click on it to show its content.</p>
+
+<ul class="thumbnails">
+    <li class="span8">
+         <div class="thumbnail">
+            <a href="../../static/img/calendarView.PNG">
+                <div class="thumbnail">
+                    <img src="../../static/img/calendarView.PNG" alt="calendarView.PNG">
+                </div>
+            </a>
+        </div>
+    </li>
+</ul>
 <h4>How to define the hierarchy of manager/employee?</h4>
 <p>For example, if you want to define that user1 is the manager of user2, and user2 is the manager of user3 and user4, you can:</p>
 <ul>
     <li>Go to Organization page</li>
-    <li>Create one new relationship by click on Create button</li>
-    <li>Put User name=user2, Manager name=user1, Team member = user3, user4 </li>
+    <li>Create one new record, with user name user1</li>
+    <li>Create another one new record, with user name user2, manager name user1</li>
+    <li>Create another one new record, with user name user3, manager name user2</li>
+    <li>Create another one new record, with user name user4, manager name user2</li>
 </ul>
+
+<ul class="thumbnails">
+    <li class="span3">
+        <div class="thumbnail">
+            <a href="../../static/img/User1.PNG">
+                <div class="thumbnail">
+                    <img src="../../static/img/User1.PNG" alt="User1.PNG">
+                </div>
+            </a>
+        </div>
+    </li>
+    <li class="span3">
+        <div class="thumbnail">
+            <a href="../../static/img/User2.PNG">
+                <div class="thumbnail">
+                    <img src="../../static/img/User2.PNG" alt="User2.PNG">
+                </div>
+            </a>
+        </div>
+    </li>
+    <li class="span4">
+        <div class="thumbnail">
+            <a href="../../static/img/orgnaizationList.PNG">
+                <div class="thumbnail">
+                    <img src="../../static/img/orgnaizationList.PNG" alt="orgnaizationList.PNG">
+                </div>
+            </a>
+        </div>
+    </li>
+</ul>
+
+
 {% endblock %}
